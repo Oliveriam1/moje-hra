@@ -2,5 +2,5 @@
 using namespace std;
 
 main () {
-    cout << "zkouska";
+    cout << "zkouska, skibidi toilet";
 }
