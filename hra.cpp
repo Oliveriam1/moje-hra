@@ -1,4 +1,5 @@
 #include <iostream>
+// Nezapomen poupravit statistiky u postav(vigor, ...)
 
 struct Hrac {
     std::string jmeno;
@@ -13,12 +14,22 @@ struct Hrac {
 struct Nepritel {
     std::string njmeno;
     int nvigor;
-    int nendurance;
-    int nintelligence;
-    int nstrength;
+    int nstrength; //Jak velke poskozeni ti bude udelovat
 };
 
-void overeni(std::string &potvrzeni, std::string role, Hrac &h){
+struct Miniboss {
+    std::string mbjmeno;
+    int mbvigor;
+    int mbstrength;
+};
+
+struct Boss {
+    std::string bjmeno;
+    int bvigor;
+    int bstrength;
+};
+
+void overeni(std::string &potvrzeni, std::string role, Hrac &h) {
     bool platnost_potvrzeni = false;
         while (!platnost_potvrzeni){
             std::cout << "Jste si jisti ze chcete tuto roli? (Y/N): ";
@@ -28,9 +39,9 @@ void overeni(std::string &potvrzeni, std::string role, Hrac &h){
                     std::cout << "Role schvalena!";
                     platnost_potvrzeni = true;
                 } else if (potvrzeni == "N" || potvrzeni == "n"){
-                    std::cout << "Vyberte si tedy znovu (Nix, Havel, Raven): ";
+                    std::cout << "Vyberte si tedy znovu (N!x, Havel, Raven): ";
                     std::cin >> role;
-                    if (role == "Nix"){
+                    if (role == "N!x"){
                         h.vigor = 7;
                         h.role = role;
                         h.endurance = 6;
@@ -52,11 +63,24 @@ void overeni(std::string &potvrzeni, std::string role, Hrac &h){
         }
 }
 
-Hrac createHrac(const std::string &jmeno, const std::string &role){
+Nepritel createNepritel (const std::string &njmeno) {
+    Nepritel n;
+    n.njmeno = njmeno;
+        if (njmeno == "1"){ // PRIDAT JMENA
+            n.nvigor = 10;
+            n.nstrength = 10;
+        } else if (njmeno == "2"){
+            n.nvigor = 20;
+        } else if (njmeno == "3"){
+            n.nvigor = 20;
+        }
+}
+
+Hrac createHrac(const std::string &jmeno, const std::string &role) {
     Hrac h;
     std::string potvrzeni;
     h.jmeno = jmeno;
-        if (role == "Nix"){
+        if (role == "N!x"){
             h.vigor = 7;
             h.role = role;
             h.endurance = 6;
@@ -88,7 +112,7 @@ Hrac createHrac(const std::string &jmeno, const std::string &role){
 void zacatek(std::string &jmeno, std::string &role) {
     std::cout << "Vitej v me hre, dobrodruhu. Pred tebou se oteviraji dvere do sveta plneho nebezpeci, tajemstvi a dobrodruzstvi. Jako hrdina mas pred sebou spoustu vyzev." << std::endl << "Tvoje cesta zacina nyni, ale nez se vydas do boje, je treba pochopit, system utoku." << std::endl << "Boj bude probihat formou psani textu. Zadny obycejny boj s mecem nebo ciste random zaletisost to nebude." << std::endl << "Misto toho tedy budes muset rychle reagovat na vyzvy, ktere ti budou predkladany ve forme textu. Cely system bude zalezet na tom, jak rychle dokazes napsat odpoved." << std::endl << "Statistiky tve postavy ovlivni tvuj uspech v boji:" << std::endl;
     std::cout << std::endl;
-    std::cout << "Vigor urcuje, jak dlouho vydrzis v boji" << std::endl;
+    std::cout << "Vigor urcuje, jak dlouho vydrzis v boji." << std::endl;
     std::cout << "Endurance urcuje, casovy limit na psani odpovedi." << std::endl;
     std::cout << "Intelligence ovlivnuje slozitost textu, ktery budes muset napsat." << std::endl;
     std::cout << "Strength urcuje, velikost textu." << std::endl;
@@ -98,12 +122,14 @@ void zacatek(std::string &jmeno, std::string &role) {
     std::cout << std::endl << std::endl;
     std::cout << "Jak se budes jmenovat?: ";
     std::cin >> jmeno;
-    std::cout << "Vyber roli (Nix, Havel, Raven): ";
+    std::cout << "Vyber roli (N!x, Havel, Raven): ";
     std::cin >> role;
 }
 
 
-main () {
+main() {
+    std::string njmeno;
+
     std::string jmeno;
     std::string role;
     std::string potvrzeni;
