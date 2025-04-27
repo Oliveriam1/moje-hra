@@ -1,4 +1,9 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <random>
+
+using namespace std::chrono;
 // Nezapomen poupravit statistiky u postav(vigor, ...)
 
 struct Hrac {
@@ -27,40 +32,105 @@ struct Boss {
     std::string bjmeno;
     int bvigor;
     int bstrength;
+    int bspecials;
 };
+
+struct Vesnice {
+    std::string obchod; //Pro koupeni potion ktery pridaji boost do zivotu, nebo inteligennce, ...
+    std::string mlekarna; //Pro vyhealeni
+    std::string mag; //Pro vylepsen
+};
+
+std::string randomtext(){
+    std::string moznosti[6] = {
+        "Skibdii boilet",
+        "bobardinokrokodini",
+        "bombinigusini",
+        "kapucinoassasino",
+        "Tralelotralala",
+        "zibrazubrazibralini"
+    };
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    std::uniform_int_distribution<> distrib(0, 5);
+    int index = distrib(gen);
+    return moznosti[index];
+
+}
+
+void utok(){
+    std::string zadanytext = randomtext();
+    std::cout << "Mate 5 sekund na napsani: " << zadanytext << std::endl;
+    
+    auto start = steady_clock::now();
+
+    std::string vstupnitext;
+    std::cin >> vstupnitext;
+
+    auto end = steady_clock::now();
+    
+    auto trvani = duration_cast<seconds>(end - start).count();
+
+    if (trvani <= 5 && vstupnitext == zadanytext) {
+        std::cout << "Vyborne! Ubral si " << std::endl; //dodelat vypsani damage
+    } else {
+        std::cout << "Ubral ti -1 zivot (" << trvani << " sekund)" << std::endl; //dodelat vypsani emocionalniho poskozeni
+    }
+}
 
 void overeni(std::string &potvrzeni, std::string role, Hrac &h) {
     bool platnost_potvrzeni = false;
-        while (!platnost_potvrzeni){
-            std::cout << "Jste si jisti ze chcete tuto roli? (Y/N): ";
-            std::cin >> potvrzeni;
+    while (!platnost_potvrzeni){
+        std::cout << "Jste si jisti ze chcete tuto roli? (Y/N): ";
+        std::cin >> potvrzeni;
 
-                if (potvrzeni == "Y" || potvrzeni == "y"){
-                    std::cout << "Role schvalena!";
-                    platnost_potvrzeni = true;
-                } else if (potvrzeni == "N" || potvrzeni == "n"){
-                    std::cout << "Vyberte si tedy znovu (N!x, Havel, Raven): ";
-                    std::cin >> role;
-                    if (role == "N!x"){
-                        h.vigor = 7;
-                        h.role = role;
-                        h.endurance = 6;
-                        h.intelligence = 18;
-                        h.strength = 5;
-                    } else if (role == "Havel"){
-                        h.vigor  = 15;
-                        h.endurance = 12;
-                        h.intelligence = 5;
-                        h.strength = 18;
-                    } else if (role == "Raven"){
-                        h.vigor  = 10;
-                        h.endurance = 14;
-                        h.intelligence = 7;
-                        h.strength = 9;
-                    }
-                    platnost_potvrzeni = false;
+            if (potvrzeni == "Y" || potvrzeni == "y"){
+                std::cout << "Role schvalena!";
+                platnost_potvrzeni = true;
+            } else if (potvrzeni == "N" || potvrzeni == "n"){
+                std::cout << "Vyberte si tedy znovu (N!x, Havel, Raven): ";
+                std::cin >> role;
+                if (role == "N!x"){
+                    h.vigor = 7;
+                    h.endurance = 6;
+                    h.intelligence = 18;
+                    h.strength = 5;
+                    std::cout << std::endl;
+                    std::cout << "  " << "Statistiky: " << std::endl;
+                    std::cout << "             " << "Vigor: " << h.vigor << std::endl;
+                    std::cout << "             " << "Endurance: " << h.endurance << std::endl;
+                    std::cout << "             " << "Intelligence: " << h.intelligence << std::endl;
+                    std::cout << "             " << "Strength: " << h.strength << std::endl;
+                    std::cout << std::endl;
+                } else if (role == "Havel"){
+                    h.vigor  = 15;
+                    h.endurance = 12;
+                    h.intelligence = 5;
+                    h.strength = 18;
+                    std::cout << std::endl;
+                    std::cout << "  " << "Statistiky: " << std::endl;
+                    std::cout << "             " << "Vigor: " << h.vigor << std::endl;
+                    std::cout << "             " << "Endurance: " << h.endurance << std::endl;
+                    std::cout << "             " << "Intelligence: " << h.intelligence << std::endl;
+                    std::cout << "             " << "Strength: " << h.strength << std::endl;
+                    std::cout << std::endl;
+                } else if (role == "Raven"){
+                    h.vigor  = 10;
+                    h.endurance = 14;
+                    h.intelligence = 7;
+                    h.strength = 9;
+                    std::cout << std::endl;
+                    std::cout << "  " << "Statistiky: " << std::endl;
+                    std::cout << "             " << "Vigor: " << h.vigor << std::endl;
+                    std::cout << "             " << "Endurance: " << h.endurance << std::endl;
+                    std::cout << "             " << "Intelligence: " << h.intelligence << std::endl;
+                    std::cout << "             " << "Strength: " << h.strength << std::endl;
+                    std::cout << std::endl;
                 }
+            platnost_potvrzeni = false;
         }
+    }
 }
 
 Nepritel createNepritel (const std::string &njmeno) {
@@ -74,6 +144,21 @@ Nepritel createNepritel (const std::string &njmeno) {
         } else if (njmeno == "3"){
             n.nvigor = 20;
         }
+}
+
+Miniboss createMiniboss (const std::string &mbjmeno) {
+    Miniboss mb;
+    mb.mbjmeno = mbjmeno;
+
+}
+
+Boss createBoss (const std::string &bjmeno) {
+    Boss b;
+    b.bjmeno = bjmeno;
+    b.bjmeno = "Thornhost";
+    b.bvigor = 100;
+    b.bspecials = -10;
+
 }
 
 Hrac createHrac(const std::string &jmeno, const std::string &role) {
@@ -103,7 +188,7 @@ Hrac createHrac(const std::string &jmeno, const std::string &role) {
     std::cout << "             " << "Vigor: " << h.vigor << std::endl;
     std::cout << "             " << "Endurance: " << h.endurance << std::endl;
     std::cout << "             " << "Intelligence: " << h.intelligence << std::endl;
-    std::cout << "             " << "Strength: " << h.strength << std::endl;
+    std::cout << "             " << "Strength: " << h.strength << std::endl; //Kdztak pozdejs strcit do funkce pro estetiku
     std::cout << std::endl;
 
     return h;
@@ -139,7 +224,9 @@ main() {
     Hrac hrac = createHrac(jmeno, role);
 
     overeni(potvrzeni, role, hrac);
-    std::cout << "Zivoty postavy (" << hrac.jmeno << "): " << hrac.vigor << std::endl; //Oli to je třeba na vypsání životu
+
+    utok();
+    std::cout << "Zivoty postavy (" << hrac.jmeno << "): " << hrac.vigor << std::endl; //Oli to je treba na vypsani zivotu
 
 
 }
