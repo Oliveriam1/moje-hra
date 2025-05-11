@@ -59,9 +59,9 @@ std::string randomtext(){
 
 }
 
-void utok(const std::string &njmeno, int &nstrength, int &vigor){
+void utok(const Nepritel &nepritel, Hrac &hrac){
     std::string zadanytext = randomtext();
-    std::cout << "Mate 5 sekund na napsani: " << zadanytext << std::endl;
+    std::cout << "Mate " << hrac.endurance << " sekund na napsani: " << zadanytext << std::endl;
     
     auto start = steady_clock::now();
 
@@ -73,12 +73,15 @@ void utok(const std::string &njmeno, int &nstrength, int &vigor){
     auto trvani = duration_cast<seconds>(end - start).count();
     // udleat funkci na vybrani nepritele oliku nezapomen
     if (trvani <= 5 && vstupnitext == zadanytext) {
-        std::cout << "Vyborne! Ubral si " << std::endl; //dodelat vypsani damage
+        std::cout << "Vyborne! Ubral si: " << hrac.strength << std::endl; //dodelat vypsani damage
     } else {
-        if (njmeno == "1"){
-            std::cout << "Ubral ti: " << vigor - nstrength << std::endl;
+        if (nepritel.njmeno == "1"){
+            int damage = hrac.vigor - nepritel.nstrength;
+            std::cout << "Tve zivoty: " << damage << std::endl;
+            if (damage <= 0){
+                std::cout << "Zemrel si..." << std::endl;
+            }
         }
-        std::cout << "Ubral ti -1 zivot (" << trvani << " sekund)" << std::endl; //dodelat vypsani emocionalniho poskozeni
     }
 }
 
@@ -141,18 +144,20 @@ Nepritel createNepritel (const std::string &njmeno){
     n.njmeno = njmeno;
         if (njmeno == "1"){ // PRIDAT JMENA
             n.nvigor = 10;
-            n.nstrength = 10;
+            n.nstrength = 5;
         } else if (njmeno == "2"){
             n.nvigor = 20;
         } else if (njmeno == "3"){
             n.nvigor = 20;
         }
+        return n;
 }
 
 Miniboss createMiniboss (const std::string &mbjmeno){
     Miniboss mb;
     mb.mbjmeno = mbjmeno;
 
+    return mb;
 }
 
 Boss createBoss (const std::string &bjmeno){
@@ -161,6 +166,8 @@ Boss createBoss (const std::string &bjmeno){
     b.bjmeno = "Thornhost";
     b.bvigor = 100;
     b.bspecials = -10;
+
+    return b;
 }
 
 Hrac createHrac(const std::string &jmeno, const std::string &role){
@@ -199,7 +206,6 @@ Hrac createHrac(const std::string &jmeno, const std::string &role){
 Vesnice createVesnice(const std::string &obchod, const std::string &mlekarna, std::string &mag){
     Vesnice v;
         char vyberobchodu;
-    
 
         std::cout << "Něco olivere dopiššš"; // dopsat uvitani do vesnice
         std::cout << "Vyber si kam chces zajit: [obchod, mlekarna, mag] ";
@@ -217,6 +223,7 @@ Vesnice createVesnice(const std::string &obchod, const std::string &mlekarna, st
                 //Funkci Na vylepseni statistik
                 break;
         }
+        return v;
 }
 
 void cara(){
@@ -255,10 +262,11 @@ int main(){
     zacatek(jmeno, role);
 
     Hrac hrac = createHrac(jmeno, role);
+    Nepritel nepritel = createNepritel("1"); // zavolani daneho nepritele
 
     overeni(potvrzeni, role, hrac);
 
-    utok(njmeno, nstrength, vigor);
+    utok(nepritel, hrac);
     std::cout << "Zivoty postavy (" << hrac.jmeno << "): " << hrac.vigor << std::endl; //Oli to je treba na vypsani zivotu
 
 
