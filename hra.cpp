@@ -12,7 +12,7 @@ struct Hrac{
     int vigor; // Urcuje zivoty
     int endurance; // Urcuje cas na psani textu
     int intelligence; // Urcuje slozitost textu
-    int strength; // Urcuje mnozstvi textu
+    int strength; // Urcuje poskozeni zakolik ubere
     int penize;
 };
 
@@ -59,31 +59,41 @@ std::string randomtext(){
 
 }
 
-void utok(const Nepritel &nepritel, Hrac &hrac){
-    std::string zadanytext = randomtext();
-    std::cout << "Mate " << hrac.endurance << " sekund na napsani: " << zadanytext << std::endl;
-    
-    auto start = steady_clock::now();
+void utok(Nepritel &nepritel, Hrac &hrac){
+    while(hrac.vigor > 0 && nepritel.nvigor > 0) {
+        std::string zadanytext = randomtext();
+        std::cout << "Mate " << hrac.endurance << " sekund na napsani: " << zadanytext << std::endl;
+        auto start = steady_clock::now();
 
-    std::string vstupnitext;
-    std::cin >> vstupnitext;
+        std::string vstupnitext;
+        std::cin >> vstupnitext;
 
-    auto end = steady_clock::now();
+        auto end = steady_clock::now();
     
-    auto trvani = duration_cast<seconds>(end - start).count();
-    // udleat funkci na vybrani nepritele oliku nezapomen
-    if (trvani <= 5 && vstupnitext == zadanytext) {
-        std::cout << "Vyborne! Ubral si: " << hrac.strength << std::endl; //dodelat vypsani damage
-    } else {
-        if (nepritel.njmeno == "1"){
-            int damage = hrac.vigor - nepritel.nstrength;
-            std::cout << "Tve zivoty: " << damage << std::endl;
-            if (damage <= 0){
-                std::cout << "Zemrel si..." << std::endl;
+        auto trvani = duration_cast<seconds>(end - start).count();
+        // udleat funkci na vybrani nepritele oliku nezapomen
+        if (trvani <= hrac.endurance && vstupnitext == zadanytext) {
+            if (nepritel.njmeno == "1"){
+                nepritel.nvigor = nepritel.nvigor - hrac.strength;
+                std::cout << "Vyborne zasahl si hit... " << std::endl << "Zivoty nepritele: " << nepritel.nvigor << std::endl;
+                if (nepritel.nvigor <= 0){
+                    std::cout << "Vyhral si souboj...";
+                    break;
+                }
+            } 
+        } else {
+                if (nepritel.njmeno == "1"){
+                    hrac.vigor = hrac.vigor - nepritel.nstrength;
+
+                    std::cout << "Tve zivoty: " << hrac.vigor << std::endl;
+                    if (hrac.vigor <= 0){
+                        std::cout << "Zemrel si..." << std::endl;
+                        break;
+                    }
+                }
             }
-        }
+        }    
     }
-}
 
 void overeni(std::string &potvrzeni, std::string role, Hrac &h){
     bool platnost_potvrzeni = false;
@@ -203,21 +213,29 @@ Hrac createHrac(const std::string &jmeno, const std::string &role){
     return h;
 }
 
-Vesnice createVesnice(const std::string &obchod, const std::string &mlekarna, std::string &mag){
+Vesnice createVesnice(Vesnice &vesnice, Hrac &hrac){
     Vesnice v;
         char vyberobchodu;
+        std::string odpovedmlekarna;
 
-        std::cout << "Něco olivere dopiššš"; // dopsat uvitani do vesnice
-        std::cout << "Vyber si kam chces zajit: [obchod, mlekarna, mag] ";
+        std::cout << ""; // dopsat uvitani do vesnice
+        std::cout << "Vyber si kam chces zajit: [obchod - o, mlekarna - m, mag] ";
         std::cin >> vyberobchodu;
 
         switch(vyberobchodu){
-                case 'obchod':
+                case 'o':
                 //udelat vic funkci obchodu, kde bude vzdycky jiny vyber veci
                 break;
-                case 'mlekarna':
-                std::cout << "Co to bude?";
-                std::cout << "   Heal potion (+3)" << std::endl;
+                case 'm':
+                std::cout << "Muzete si koupit Heal potion...\n";
+                std::cout << "Menu:" << std::endl;
+                std::cout << "   Heal potion (+3) [Cena - 3] [H]" << std::endl;
+                std::cout << "Co to bude? ";
+                std::cin >> odpovedmlekarna;
+                    if(odpovedmlekarna == "H"){
+                        std::cout << "Vase zivoty: " << hrac.vigor + 3;
+                    }
+
                 break;
                 case 'mag':
                 //Funkci Na vylepseni statistik
@@ -263,11 +281,10 @@ int main(){
 
     Hrac hrac = createHrac(jmeno, role);
     Nepritel nepritel = createNepritel("1"); // zavolani daneho nepritele
-
     overeni(potvrzeni, role, hrac);
 
     utok(nepritel, hrac);
-    std::cout << "Zivoty postavy (" << hrac.jmeno << "): " << hrac.vigor << std::endl; //Oli to je treba na vypsani zivotu
-
+    std::cout << std::endl << "Zivoty postavy (" << hrac.jmeno << "): " << hrac.vigor << std::endl; //Oli to je treba na vypsani zivotu
+    Vesnice vesnice = createVesnice(vesnice, hrac);
 
 }
