@@ -9,6 +9,7 @@ using namespace std::chrono;
 struct Hrac{
     std::string jmeno;
     std::string role;
+    int maxvigor; // Urcuje max pocet zivotu
     int vigor; // Urcuje zivoty
     int endurance; // Urcuje cas na psani textu
     int intelligence; // Urcuje slozitost textu
@@ -109,6 +110,7 @@ void overeni(std::string &potvrzeni, std::string role, Hrac &h){
                 std::cin >> role;
                 if (role == "N!x"){
                     h.vigor = 7;
+                    h.maxvigor = 7;
                     h.endurance = 6;
                     h.intelligence = 18;
                     h.strength = 5;
@@ -121,6 +123,7 @@ void overeni(std::string &potvrzeni, std::string role, Hrac &h){
                     std::cout << std::endl;
                 } else if (role == "Havel"){
                     h.vigor  = 15;
+                    h.maxvigor = 15;
                     h.endurance = 12;
                     h.intelligence = 5;
                     h.strength = 18;
@@ -133,6 +136,7 @@ void overeni(std::string &potvrzeni, std::string role, Hrac &h){
                     std::cout << std::endl;
                 } else if (role == "Raven"){
                     h.vigor  = 10;
+                    h.maxvigor = 10;
                     h.endurance = 14;
                     h.intelligence = 7;
                     h.strength = 9;
@@ -186,17 +190,20 @@ Hrac createHrac(const std::string &jmeno, const std::string &role){
     h.jmeno = jmeno;
         if (role == "N!x"){
             h.vigor = 7;
+            h.maxvigor = 7;
             h.role = role;
             h.endurance = 6;
             h.intelligence = 18;
             h.strength = 5;
         } else if (role == "Havel"){
             h.vigor  = 15;
+            h.maxvigor = 15;
             h.endurance = 12;
             h.intelligence = 5;
             h.strength = 18;
         } else if (role == "Raven"){
-            h.vigor  = 10;
+            h.vigor = 10;
+            h.maxvigor = 10;
             h.endurance = 14;
             h.intelligence = 7;
             h.strength = 9;
@@ -217,9 +224,10 @@ Vesnice createVesnice(Vesnice &vesnice, Hrac &hrac){
     Vesnice v;
         char vyberobchodu;
         std::string odpovedmlekarna;
+        std::string odpovedmag;
 
         std::cout << ""; // dopsat uvitani do vesnice
-        std::cout << "Vyber si kam chces zajit: [obchod - o, mlekarna - m, mag] ";
+        std::cout << "Vyber si kam chces zajit: [obchod - o, mlekarna - m, mag - g] ";
         std::cin >> vyberobchodu;
 
         switch(vyberobchodu){
@@ -232,13 +240,29 @@ Vesnice createVesnice(Vesnice &vesnice, Hrac &hrac){
                 std::cout << "   Heal potion (+3) [Cena - 3] [H]" << std::endl;
                 std::cout << "Co to bude? ";
                 std::cin >> odpovedmlekarna;
-                    if(odpovedmlekarna == "H"){
-                        std::cout << "Vase zivoty: " << hrac.vigor + 3;
+                    if (odpovedmlekarna == "H"){
+                        if (hrac.maxvigor > hrac.vigor){
+                            hrac.vigor = hrac.vigor + 3;
+                        } else if (hrac.maxvigor = hrac.vigor){
+                            hrac.vigor = hrac.maxvigor;
+                        } else {
+                            std::cout << "Mate blbe"; 
+                        }
+                        std::cout << "Vase zivoty: " << hrac.vigor;
                     }
 
                 break;
-                case 'mag':
-                //Funkci Na vylepseni statistik
+                case 'g':
+                std::cout << "Zde si muzete vylepsovat sve statistiky..." << std::endl;
+                std::cout << "Menu:" << std::endl;
+                std::cout << "   Vigor (+1) [Cena -]" << std::endl;
+                std::cout << "Co chcete vylepsit? ";
+                std::cin >> odpovedmag;
+                    if (odpovedmag == "V"){
+                        hrac.maxvigor++;
+                        std::cout << "Vase max zdravi se zvyslo: " << hrac.maxvigor;//nastav hranici zivotu ze nemuse jit dal s healpotionama a na to by bylo prave to upgradovani... zvysovani max statistik
+                    }
+                //Olivereeee dodelej pak vsechny ty statistiky a vic lidstejsi text plsky mlsky a urci cenuuuuu
                 break;
         }
         return v;
