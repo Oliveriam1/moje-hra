@@ -14,7 +14,8 @@ struct Hrac{
     int endurance; // Urcuje cas na psani textu
     int intelligence; // Urcuje slozitost textu
     int strength; // Urcuje poskozeni zakolik ubere
-    int penize;
+    int penize = 10;
+    int xp = 1;
 };
 
 struct Nepritel{
@@ -238,29 +239,40 @@ Vesnice createVesnice(Vesnice &vesnice, Hrac &hrac){
                 std::cout << "Muzete si koupit Heal potion...\n";
                 std::cout << "Menu:" << std::endl;
                 std::cout << "   Heal potion (+3) [Cena - 3] [H]" << std::endl;
+                std::cout << "Mate " << hrac.penize << " zlataku..." << std::endl;
                 std::cout << "Co to bude? ";
                 std::cin >> odpovedmlekarna;
-                    if (odpovedmlekarna == "H"){
-                        if (hrac.maxvigor > hrac.vigor){
-                            hrac.vigor = hrac.vigor + 3;
+
+                    if (odpovedmlekarna == "H" || odpovedmlekarna == "h"){
+                        if (hrac.penize >= 3) {
+                            if (hrac.maxvigor > hrac.vigor){
+                                hrac.vigor = hrac.vigor + 3;
+                                hrac.penize = hrac.penize - 3;
+                            }        
                         } else if (hrac.maxvigor = hrac.vigor){
                             hrac.vigor = hrac.maxvigor;
                         } else {
                             std::cout << "Mate blbe"; 
                         }
-                        std::cout << "Vase zivoty: " << hrac.vigor;
+                        std::cout << "Vase zivoty po vyhealeni: " << hrac.vigor << std::endl;
+                        std::cout << "Zbyvta ti " << hrac.penize << " zlataku." << std::endl;
                     }
 
                 break;
                 case 'g':
                 std::cout << "Zde si muzete vylepsovat sve statistiky..." << std::endl;
                 std::cout << "Menu:" << std::endl;
-                std::cout << "   Vigor (+1) [Cena -]" << std::endl;
+                std::cout << "   Vigor (+1) [Cena - 1xp] [V]" << std::endl;
                 std::cout << "Co chcete vylepsit? ";
                 std::cin >> odpovedmag;
                     if (odpovedmag == "V"){
-                        hrac.maxvigor++;
-                        std::cout << "Vase max zdravi se zvyslo: " << hrac.maxvigor;//nastav hranici zivotu ze nemuse jit dal s healpotionama a na to by bylo prave to upgradovani... zvysovani max statistik
+                        if (hrac.xp >=1){
+                            hrac.maxvigor++;
+                            std::cout << "Vase max zdravi se zvyslo: " << hrac.maxvigor;//nastav hranici zivotu ze nemuse jit dal s healpotionama a na to by bylo prave to upgradovani... zvysovani max statistik
+                        } else {
+                            std::cout << "Jdi domu..." << std::endl;
+                        }
+
                     }
                 //Olivereeee dodelej pak vsechny ty statistiky a vic lidstejsi text plsky mlsky a urci cenuuuuu
                 break;
