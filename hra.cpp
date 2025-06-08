@@ -4,7 +4,23 @@
 #include <random>
 
 using namespace std::chrono;
+using namespace std::this_thread;
 // Nezapomen poupravit statistiky u postav(vigor, ...)
+
+void pauza(std::string typpauzy){
+    if (typpauzy == "1"){
+        sleep_for(seconds(2));
+    }
+    else if (typpauzy == "3"){
+        sleep_for(seconds(5));
+    }
+}
+
+void cara(){
+    for (int i = 0; i < 113; i++){
+        std::cout << "_";
+    }
+}
 
 struct Hrac{
     std::string jmeno;
@@ -16,6 +32,7 @@ struct Hrac{
     int strength; // Urcuje poskozeni zakolik ubere
     int penize = 10;
     int xp = 1;
+    int healpotion; //DODELEJ HEALPOTIONS A VYMEN TO VVVVVVV MLEKARNE ZE SI TO BUDE MOCT NOSIT V INV AA POUZIT TO TREBA PRI UTOCENI
 };
 
 struct Nepritel{
@@ -33,6 +50,7 @@ struct Miniboss{
 struct Boss{
     std::string bjmeno;
     int bvigor;
+    int bmaxvigor;
     int bstrength;
     int bspecials;
 };
@@ -62,8 +80,27 @@ std::string randomtext(){
 }
 
 void utok(Nepritel &nepritel, Hrac &hrac){
+    int pocetkol = 0;
     while(hrac.vigor > 0 && nepritel.nvigor > 0) {
+        pocetkol++;
+
+        pauza("1");
+        std::cout << std::endl << std::endl;
+        std::cout << "=== Kolo " << pocetkol << " ===" << std::endl;
+        std::cout << "Tvoje zivoty: " << hrac.vigor << "/" << hrac.maxvigor << std::endl;
+        std::cout << "Nepritelovi zivoty: " << nepritel.nvigor << std::endl;
+        std::cout << std::endl;
+
         std::string zadanytext = randomtext();
+        char odpovedutok;
+        do {
+            std::cout << "Chces utocit (a) nebo se pouzit healpotion (b)?: ";
+            std::cin >> odpovedutok;
+        } while (odpovedutok != 'a' && odpovedutok != 'b');
+
+        if (odpovedutok == 'a'){
+        std::cout << "Priprav se na utok..." << std::endl;
+        pauza("1");
         std::cout << "Mate " << hrac.endurance << " sekund na napsani: " << zadanytext << std::endl;
         auto start = steady_clock::now();
 
@@ -94,8 +131,92 @@ void utok(Nepritel &nepritel, Hrac &hrac){
                     }
                 }
             }
-        }    
+        } else if (odpovedutok == 'b'){
+            std::cout << "LEcenmiii" << std::endl;
+        }
+    }        
+}
+
+void bossfight(Boss &boss, Hrac &hrac){
+    int pocetkol = 0;
+    bool bossfaze2 = false;
+    char odpovedboss;
+
+    while (hrac.vigor > 0 && boss.bvigor > 0) {
+        pocetkol++;
+        std::string zadanytext = randomtext();
+
+        pauza("1");
+        std::cout << std::endl << std::endl;
+        std::cout << "=== Kolo " << pocetkol << " ===" << std::endl;
+        std::cout << "Tvoje zivoty: " << hrac.vigor << "/" << hrac.maxvigor << std::endl;
+        std::cout << "Thornhostovoti zivoty: " << boss.bvigor << std::endl;
+        std::cout << std::endl;
+
+        do {
+            std::cout << "Chces utocit (a) nebo se pouzit healpotion (b)?: ";
+            std::cin >> odpovedboss;
+        } while (odpovedboss != 'a' && odpovedboss != 'b');
+
+        if (odpovedboss == 'a') {
+            std::cout << "Priprav se na utok..." << std::endl;
+            pauza("1");
+            std::cout << "Napis rychle: " << zadanytext << " za: " << hrac.endurance << " sekund" << std::endl;
+
+        auto start = steady_clock::now();
+
+        std::string vstupnitext;
+        std::cin >> vstupnitext;
+
+        auto end = steady_clock::now();
+
+        auto trvani = duration_cast<seconds>(end - start).count();
+
+        std::cout << std::endl;
+        if (trvani <= hrac.endurance && zadanytext == vstupnitext){
+            boss.bvigor = boss.bvigor - hrac.strength;
+            std::cout << "Zasahl jsi bosse za: " << hrac.strength << std::endl;
+
+            int odrazeni = hrac.strength / 3;
+            hrac.vigor = hrac.vigor - odrazeni;
+            std::cout << "Thornhost odrazi: " << odrazeni << " poskozeni" << std::endl;
+
+            if (pocetkol % 2 == 0){
+                int trnyposkozeni = 5;
+                hrac.vigor = hrac.vigor - trnyposkozeni;
+                std::cout << "Thornost vystreluje trny! Ztracis: " << trnyposkozeni << " HP" << std::endl;
+            }
+            if (boss.bvigor < boss.bmaxvigor * 0.3 && !bossfaze2){
+                bossfaze2 = true;
+                std::cout << "THORNOST ZACINA VYBUSNOU FAZI !!!" << std::endl;
+            }
+            if (bossfaze2){
+                hrac.vigor = hrac.vigor - 10;
+                boss.bvigor = boss.bvigor -10;
+                std::cout << "Trnovy vybuch!! Oba ztracite 10 HP!";
+            }
+        }
+        else {
+            hrac.vigor = hrac.vigor - boss.bstrength;
+            std::cout << "Zasahl tee za: " << boss.bstrength << " zivotu" << std::endl;
+        }
+    } else if (odpovedboss == 'b'){
+        std::cout << "vyhlili ses" << std::endl;
     }
+        
+//Olivere udelej nabidku pri fightech ze si muzes vybrat jestli chces zautocit nebo se vylecitt
+        if (hrac.vigor <= 0){
+            std::cout << "\nZemrel si";
+            break;
+        }
+        if (boss.bvigor <= 0){
+            std::cout << "VITEZSTVIIII!!!";
+            break;
+        }
+
+        cara(); //odelovac kol oliku
+    }
+}
 
 void overeni(std::string &potvrzeni, std::string role, Hrac &h){
     bool platnost_potvrzeni = false;
@@ -177,10 +298,10 @@ Miniboss createMiniboss (const std::string &mbjmeno){
 
 Boss createBoss (const std::string &bjmeno){
     Boss b;
-    b.bjmeno = bjmeno;
     b.bjmeno = "Thornhost";
     b.bvigor = 100;
     b.bspecials = -10;
+    b.bstrength = 10;
 
     return b;
 }
@@ -280,12 +401,6 @@ Vesnice createVesnice(Vesnice &vesnice, Hrac &hrac){
         return v;
 }
 
-void cara(){
-    for (int i = 0; i < 113; i++){
-        std::cout << "_";
-    }
-}
-
 void zacatek(std::string &jmeno, std::string &role){
     std::cout << "Vitej v me hre, dobrodruhu. Pred tebou se oteviraji dvere do sveta plneho nebezpeci, tajemstvi a dobrodruzstvi. Jako hrdina mas pred sebou spoustu vyzev." << std::endl << "Tvoje cesta zacina nyni, ale nez se vydas do boje, je treba pochopit, system utoku." << std::endl << "Boj bude probihat formou psani textu. Zadny obycejny boj s mecem nebo ciste random zaletisost to nebude." << std::endl << "Misto toho tedy budes muset rychle reagovat na vyzvy, ktere ti budou predkladany ve forme textu. Cely system bude zalezet na tom, jak rychle dokazes napsat odpoved." << std::endl << "Statistiky tve postavy ovlivni tvuj uspech v boji:" << std::endl;
     std::cout << std::endl;
@@ -316,11 +431,15 @@ int main(){
     zacatek(jmeno, role);
 
     Hrac hrac = createHrac(jmeno, role);
+    Boss boss = createBoss("Thornhost");
     Nepritel nepritel = createNepritel("1"); // zavolani daneho nepritele
     overeni(potvrzeni, role, hrac);
 
-    utok(nepritel, hrac);
-    std::cout << std::endl << "Zivoty postavy (" << hrac.jmeno << "): " << hrac.vigor << std::endl; //Oli to je treba na vypsani zivotu
-    Vesnice vesnice = createVesnice(vesnice, hrac);
+    //utok(nepritel, hrac);
+    //std::cout << std::endl << "Zivoty postavy (" << hrac.jmeno << "): " << hrac.vigor << std::endl; //Oli to je treba na vypsani zivotu
+    //Vesnice vesnice = createVesnice(vesnice, hrac);
 
+    bossfight(boss, hrac); //TOHLE JE BOSFIGHT OLIKOSSS NARCOPSS
 }
+
+//pridej získávání XP za kill a i penize a potom to s temi potiony ze je budes moc nosti u sebee
